@@ -1,0 +1,26 @@
+---
+
+- name: create ganesha exports directory
+  ansible.builtin.file:
+   path: /etc/ganesha/exports/
+   state: directory
+   mode: '0755'
+
+- name: set ganesha export
+  ansible.builtin.template: 
+    src: export_ganesha.conf.j2
+    dest: /etc/ganesha/exports/export.{{ gluster_volume }}.conf
+    owner: root
+    group: root
+    mode: '0600'
+  notify:
+   - restart nfs-ganesha
+
+- name: include export to ganesha.conf
+  ansible.builtin.lineinfile: 
+    dest: /etc/ganesha/ganesha.conf 
+    regexp: '.*%include "/etc/ganesha/exports/export.{{ gluster_volume }}.conf"$' 
+    line: '%include "/etc/ganesha/exports/export.{{ gluster_volume }}.conf"' 
+    state: present
+  notify:
+   - restart nfs-ganesha

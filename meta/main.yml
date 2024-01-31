@@ -1,0 +1,17 @@
+---
+dependencies: []
+
+galaxy_info:
+  description: 'Install and configure a gluster, NFS ganesha and pacemaker'
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+  galaxy_tags:
+    - gluster
+    - ganesha
+    - cluster
+    - multinode
+    - infrastructure
+    - pacemaker
+    - nfs

@@ -1,0 +1,7 @@
+---
+
+- name: create gluster storage directory
+  ansible.builtin.file:
+   path: "{{ gluster_path }}"
+   state: directory
+   mode: '0755'

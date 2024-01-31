@@ -1,0 +1,10 @@
+---
+
+- name: Add entries to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: "/etc/hosts"
+    regexp: ".*\\s+{{ item.hostname }}"
+    line: "{{ item.ip }}\t{{ item.hostname }}"
+    state: present
+    backup: yes
+  with_items: "{{ gluster_hosts }}"

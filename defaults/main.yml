@@ -1,0 +1,5 @@
+---
+gluster_resolv_mode: dns
+gluster_volume: example
+gluster_path: /tank/
+gluster_resolv_mode: hosts

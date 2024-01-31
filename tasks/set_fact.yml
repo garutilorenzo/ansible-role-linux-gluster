@@ -1,0 +1,62 @@
+---
+
+- name: "Set gluster_iface fact default:"
+  ansible.builtin.set_fact:
+    gluster_iface: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['interface'] }}"
+  when:
+    - gluster_subnet is not defined
+
+- name: "Set gluster_ip_address fact default:"
+  ansible.builtin.set_fact:
+    gluster_ip_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+  when: 
+   - gluster_subnet is not defined
+    
+- name: "Set gluster_iface fact with gluster_subnet network:"
+  ansible.builtin.set_fact:
+    gluster_iface: "{{ hostvars[inventory_hostname]['ansible_' + item ]['device'] }}"
+  when: 
+   - gluster_subnet is defined
+   - "hostvars[inventory_hostname]['ansible_' + item ].ipv4 is defined and hostvars[inventory_hostname]['ansible_' + item ]['ipv4']['address'] | ipaddr( gluster_subnet )"
+  with_items: "{{ ansible_interfaces }}"
+
+- name: "Set gluster_ip_address fact with gluster_subnet network:"
+  ansible.builtin.set_fact:
+    gluster_ip_address: "{{ hostvars[inventory_hostname]['ansible_' + item ]['ipv4']['address'] }}"
+  when: 
+   - gluster_subnet is defined
+   - "hostvars[inventory_hostname]['ansible_' + item ].ipv4 is defined and hostvars[inventory_hostname]['ansible_' + item ]['ipv4']['address'] | ipaddr( gluster_subnet )"
+  with_items: "{{ ansible_interfaces }}"
+
+- ansible.builtin.debug:
+    msg: "gluster_ip_address: {{ gluster_ip_address }}"
+  when: debug_enabled is defined and debug_enabled
+
+- ansible.builtin.set_fact:
+    gluster_host:
+      hostname: "{{ item }}"
+      ip: "{{ hostvars[item]['gluster_ip_address'] }}"
+  with_items: "{{ groups['gluster'] }}"
+  register: gluster_hosts
+
+- ansible.builtin.set_fact:
+    gluster_hosts: "{{ gluster_hosts.results | map(attribute='ansible_facts.gluster_host') | list }}"
+
+- name: 'set fact: list list_remote_servers'
+  ansible.builtin.set_fact:
+    # Create a list of all managers' private ip addresse
+    list_remote_servers: "{{ list_remote_servers | default([]) + [item  + ':/{{ gluster_path }}' | string] }}"
+  loop: >-
+    {{ groups['gluster'] }}
+  
+- debug:
+    msg: "list_remote_servers: {{ list_remote_servers }}"
+  when: debug_enabled is defined and debug_enabled
+
+- name: 'set fact: list remote_addrs'
+  ansible.builtin.set_fact:
+    # Create a list of all managers' private ip addresse
+    list_remote_cluster: >-
+      {{ list_remote_cluster | default([])  + [ item | string ] }}
+  loop: >-
+    {{ groups['gluster'] }}

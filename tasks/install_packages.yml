@@ -1,0 +1,26 @@
+---
+
+# - name: Add an Apt signing key, uses whichever key is at the URL
+#   ansible.builtin.apt_key:
+#     url: https://download.gluster.org/pub/gluster/glusterfs/9/rsa.pub
+#     state: present
+
+# - name: Add Gluster Repository
+#   apt_repository:
+#     repo: ppa:gluster/glusterfs-7
+#     state: present
+#   ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Update apt and install glusterfs-server
+  ansible.builtin.apt: 
+    update_cache: yes 
+    name: "{{ item }}"
+    state: latest
+  loop: [glusterfs-server,nfs-ganesha-gluster,pacemaker,pcs,corosync,jq]
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: restart and enable glusterd
+  ansible.builtin.service: 
+    name: glusterd 
+    state: started 
+    enabled: yes

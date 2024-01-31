@@ -1,0 +1,44 @@
+---
+
+- include_tasks: 
+    file: set_fact.yml
+    apply:
+      tags: always,set_fact
+  tags: always,set_fact
+
+- include_tasks: 
+    file: setup_hosts.yml
+    apply:
+      tags: setup_hosts
+  tags: setup_hosts
+  when: gluster_resolv_mode == 'hosts'
+
+- include_tasks: 
+    file: install_packages.yml
+    apply:
+      tags: install_packages
+  tags: install_packages
+
+- include_tasks: 
+    file: prepare_fs.yml
+    apply:
+      tags: prepare_fs
+  tags: prepare_fs
+
+- include_tasks: 
+    file: gluster_setup.yml
+    apply:
+      tags: gluster_setup
+  tags: gluster_setup
+
+- include_tasks: 
+    file: ganesha_setup.yml
+    apply:
+      tags: ganesha_setup
+  tags: ganesha_setup
+
+- include_tasks: 
+    file: pacemaker_setup.yml
+    apply:
+      tags: pacemaker_setup
+  tags: pacemaker_setup

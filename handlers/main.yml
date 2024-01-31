@@ -1,0 +1,5 @@
+- name: restart nfs-ganesha
+  service:
+    name: nfs-ganesha
+    state: restarted
+    enabled: yes

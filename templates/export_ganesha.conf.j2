@@ -1,0 +1,21 @@
+EXPORT
+{
+    # Export Id (mandatory, each EXPORT must have a unique Export_Id)
+    Export_Id = 9;
+    # Exported path (mandatory)
+    Path = "/{{ gluster_volume }}";
+    # Exporting FSAL
+    FSAL {
+        name = GLUSTER;
+        hostname="localhost";
+        volume="{{ gluster_volume }}";
+    }
+    Access_type = RW;
+    Disable_ACL = true;
+    Squash="No_root_squash";
+    # Pseudo Path (required for NFS v4)
+    Pseudo="/{{ gluster_volume }}";
+    Protocols = "3", "4" ;
+    Transports = "UDP","TCP";
+    SecType = "sys";
+}

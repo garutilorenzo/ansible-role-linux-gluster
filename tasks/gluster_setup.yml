@@ -1,0 +1,23 @@
+- name: check if volume exist
+  ansible.builtin.shell:  gluster volume status | grep {{ gluster_volume }}
+  run_once: true
+  register: volume_exist
+  ignore_errors: yes
+
+- name: gluster peer probe
+  ansible.builtin.command: gluster peer probe {{ item }}
+  with_items: "{{ groups['gluster'] }}"
+  when: volume_exist.rc == 1 and item not in inventory_hostname
+  run_once: true
+  
+- name: Create storage volume 
+  ansible.builtin.command: gluster volume create {{ gluster_volume }} replica 3 {{ list_remote_servers | map('quote') | join(' ') }} force 
+  register: create_volume_command 
+  run_once: true
+  when: volume_exist.rc == 1
+
+- name: start storage volume
+  ansible.builtin.command: gluster volume start docker
+  register: start_volume_command
+  run_once: true
+  when: volume_exist.rc == 1
