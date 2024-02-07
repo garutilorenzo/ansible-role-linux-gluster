@@ -2,4 +2,6 @@
 gluster_resolv_mode: dns
 gluster_volume: example
 gluster_path: /tank/
-gluster_resolv_mode: hosts
+gluster_resolv_mode: dns
+gluster_volume_type: replica
+gluster_volume_replica_count_type: 3

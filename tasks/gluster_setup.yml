@@ -9,15 +9,24 @@
   with_items: "{{ groups['gluster'] }}"
   when: volume_exist.rc == 1 and item not in inventory_hostname
   run_once: true
-  
+
+- name: "Set gluster_volume_create_cmd fact:"
+  ansible.builtin.set_fact:
+    gluster_volume_create_cmd: "gluster volume create {{ gluster_volume }} {{ gluster_volume_type }} {{ gluster_volume_replica_count_type }} {{ list_remote_servers | map('quote') | join(' ') }} force"
+  when: gluster_volume_type == 'replica'
+
+- ansible.builtin.debug:
+    msg: "gluster_volume_create_cmd: {{ gluster_volume_create_cmd }}"
+  when: debug_enabled is defined and debug_enabled
+
 - name: Create storage volume 
-  ansible.builtin.command: gluster volume create {{ gluster_volume }} replica 3 {{ list_remote_servers | map('quote') | join(' ') }} force 
+  ansible.builtin.command: "{{ gluster_volume_create_cmd }}"
   register: create_volume_command 
   run_once: true
   when: volume_exist.rc == 1
 
 - name: start storage volume
-  ansible.builtin.command: gluster volume start docker
+  ansible.builtin.command: gluster volume start {{ gluster_volume }}
   register: start_volume_command
   run_once: true
   when: volume_exist.rc == 1
