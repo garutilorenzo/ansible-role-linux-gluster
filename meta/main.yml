@@ -2,6 +2,9 @@
 dependencies: []
 
 galaxy_info:
+  author: 'Lorenzo Garuti'
+  role_name: ansible-role-linux-gluster 
+  namespace: garutilorenzo
   description: 'Install and configure a gluster, NFS ganesha and pacemaker'
   platforms:
     - name: Ubuntu
